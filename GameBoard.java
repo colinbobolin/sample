@@ -3,18 +3,20 @@ package sample;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
+
 /**
  * Created by cscot_000 on 11/15/2017.
  */
 public class GameBoard extends GridPane {
     final int ROWS = 8;
     final int COLS = 8;
-    private Tile[][] tiles;
+    private ArrayList<Tile> tiles;
     private Color color = Color.BEIGE;
 
     public GameBoard() {
         super();
-        setTiles(new Tile[ROWS][COLS]);
+        tiles = new ArrayList<>();
         setUpGameBoard();
     }
 
@@ -23,8 +25,9 @@ public class GameBoard extends GridPane {
             alternateBoardColors();
             for (int x = 0; x < ROWS; x++) {
                 alternateBoardColors();
-                getTiles()[x][y] = new Tile(color);
-                super.add(getTiles()[x][y], x, y);
+                Tile tile = new Tile(x, y, color);
+                getTiles().add(tile);
+                super.add(tile, tile.getxPos(), tile.getyPos());
             }
         }
     }
@@ -43,11 +46,15 @@ public class GameBoard extends GridPane {
         this.color = color;
     }
 
-    public Tile[][] getTiles() {
+    public ArrayList<Tile> getTiles() {
         return tiles;
     }
 
-    public void setTiles(Tile[][] tiles) {
-        this.tiles = tiles;
+    public Tile getTileAt(int row, int col) throws Exception{
+        for (Tile tile : getTiles()) {
+            if (tile.getxPos() == row && tile.getyPos() == col)
+                return tile;
+        }
+        throw new Exception("Program tried to access a tile that doesn't exist.");
     }
 }

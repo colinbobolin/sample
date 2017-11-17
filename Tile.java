@@ -14,13 +14,17 @@ public class Tile extends Rectangle {
     private int yPos;
     private Piece piece;
 
-    public Tile(Color color) {
+    public Tile(int x, int y, Color color) {
         super();
         setHeight(HEIGHT);
         setWidth(WIDTH);
+        setxPos(x);
+        setyPos(y);
         setFill(color);
         setOccupied(false);
         //TODO set onClickListener to light up adjacent unoccupied tiles
+        setOnMouseClicked(event -> {
+        });
     }
 
     public boolean isOccupied() {
@@ -37,5 +41,21 @@ public class Tile extends Rectangle {
 
     public void setPiece(Piece piece) {
         this.piece = piece;
+    }
+
+    public int getxPos() {
+        return xPos;
+    }
+
+    public void setxPos(int xPos) {
+        this.xPos = xPos;
+    }
+
+    public int getyPos() {
+        return yPos;
+    }
+
+    public void setyPos(int yPos) {
+        this.yPos = yPos;
     }
 }

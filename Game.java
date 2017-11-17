@@ -7,6 +7,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 /**
  * Created by cscot_000 on 11/16/2017.
  */
@@ -32,37 +34,40 @@ public class Game {
     public void setUpPieces() {
 
         for (Piece piece : getTeamOne().getPieceList()) {
-            for (Tile[] col : getGameBoard().getTiles()) {
-                for (Tile tile : col) {
-                    if (tile.getFill().equals(Color.BURLYWOOD) && !tile.isOccupied()) {
-                        //TODO place piece on this tile
-                        tile.setPiece(piece);
-                    }
+            for (int i = 1; i<getGameBoard().getTiles().size(); i++) {
+                Tile tile = getGameBoard().getTiles().get(i-1);
+                if (tile.getFill().equals(Color.BURLYWOOD) && !tile.isOccupied()) {
+                    getGameBoard().add(piece, tile.getxPos(), tile.getyPos());
+                    tile.setOccupied(true);
+                    break;
                 }
             }
         }
-     /*   int y = 0;
-        int x = 0;
-        for (Piece piece : getTeamOne().getPieceList()) {
-            getTiles().add(piece, x, y);
-            if (x + 1 < gameBoard.COLS) x++;
-            else {
-                y++;
-                x = 0;
+
+        for (Piece piece : getTeamTwo().getPieceList()) {
+            for (int i = getGameBoard().getTiles().size(); i>0; i--) {
+                Tile tile = getGameBoard().getTiles().get(i-1);
+                if (tile.getFill().equals(Color.BURLYWOOD) && !tile.isOccupied()) {
+                    getGameBoard().add(piece, tile.getxPos(), tile.getyPos());
+                    tile.setOccupied(true);
+                    break;
+                }
             }
+        }
+    }
+
+    public void showMoveOptions(Tile tile) {
+        ArrayList<Tile> moveOptions = new ArrayList<>();
+        int row = tile.getxPos();
+        int col = tile.getyPos();
+        try {
+            moveOptions.add(getGameBoard().getTileAt(row+1, col+1));
+            moveOptions.add(getGameBoard().getTileAt(row-1, col+1));
+        }
+        catch (Exception e) {
+            e.getMessage();
         }
 
-        y = 6;
-        x = 0;
-        for (Piece piece : getTeamTwo().getPieceList()) {
-            getTiles().add(piece, x, y);
-            if (x + 1 < gameBoard.COLS) x++;
-            else {
-                y++;
-                x = 0;
-            }
-        }
-        */
     }
 
     public GameBoard getGameBoard() {
