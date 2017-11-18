@@ -1,10 +1,8 @@
 package sample;
 
 
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -16,6 +14,7 @@ public class Game {
     private Team teamOne;
     private Team teamTwo;
     private GameBoard gameBoard;
+    private Piece pieceInHand;
 
     public Game() {
         setGameBoard(new GameBoard());
@@ -32,34 +31,78 @@ public class Game {
     }
 
     public void setUpPieces() {
+        setUpTeamOne();
+        setUpTeamTwo();
+    }
 
+    public void setUpTeamOne() {
         for (Piece piece : getTeamOne().getPieceList()) {
-            for (int i = 1; i<getGameBoard().getTiles().size(); i++) {
-                Tile tile = getGameBoard().getTiles().get(i-1);
-                if (tile.getFill().equals(Color.BURLYWOOD) && !tile.isOccupied()) {
-                    getGameBoard().add(piece, tile.getxPos(), tile.getyPos());
-                    tile.setOccupied(true);
-                    break;
+            for (int m = 0; m < getGameBoard().getTiles().length; m++) {
+                for (int n = 0; n < getGameBoard().getTiles()[m].length; n++) {
+                    try {
+                        Tile tile = getGameBoard().getTileAt(n, m);
+                        if (tile.getFill().equals(Color.BURLYWOOD) && !tile.isOccupied()) {
+                            placePieceOnTile(piece, tile);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (piece.isOnBoard())
+                        break;
                 }
-            }
-        }
-
-        for (Piece piece : getTeamTwo().getPieceList()) {
-            for (int i = getGameBoard().getTiles().size(); i>0; i--) {
-                Tile tile = getGameBoard().getTiles().get(i-1);
-                if (tile.getFill().equals(Color.BURLYWOOD) && !tile.isOccupied()) {
-                    getGameBoard().add(piece, tile.getxPos(), tile.getyPos());
-                    tile.setOccupied(true);
+                if (piece.isOnBoard())
                     break;
-                }
             }
         }
     }
 
+    public void setUpTeamTwo() {
+        for (Piece piece : getTeamTwo().getPieceList()) {
+            for (int m = getGameBoard().getTiles().length - 1; m >= 0; m--) {
+                for (int n = getGameBoard().getTiles()[m].length - 1; n >= 0; n--) {
+                    try {
+                        Tile tile = getGameBoard().getTileAt(n, m);
+                        if (tile.getFill().equals(Color.BURLYWOOD) && !tile.isOccupied()) {
+                            placePieceOnTile(piece, tile);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (piece.isOnBoard())
+                        break;
+                }
+                if (piece.isOnBoard())
+                    break;
+            }
+        }
+    }
+
+    public void moveFromTileToTile(Tile startingTile, Tile requestedTile) {
+
+        removePieceFromTile(startingTile);
+        placePieceOnTile(getPieceInHand(), requestedTile);
+    }
+
+    public void removePieceFromTile(Tile tile) {
+        Piece piece = tile.getPiece();
+        setPieceInHand(piece);
+        getGameBoard().getChildren().remove(tile);
+        piece.setOnBoard(false);
+        tile.setOccupied(false);
+    }
+
+    public void placePieceOnTile(Piece piece, Tile tile) {
+        tile.setPiece(piece);
+        getGameBoard().add(piece, tile.getRow(), tile.getCol());
+        getGameBoard().getTiles()[tile.getRow()][tile.getCol()] = tile;
+        tile.setOccupied(true);
+        piece.setOnBoard(true);
+    }
+
     public void showMoveOptions(Tile tile) {
         ArrayList<Tile> moveOptions = new ArrayList<>();
-        int row = tile.getxPos();
-        int col = tile.getyPos();
+        int row = tile.getRow();
+        int col = tile.getCol();
         try {
             moveOptions.add(getGameBoard().getTileAt(row+1, col+1));
             moveOptions.add(getGameBoard().getTileAt(row-1, col+1));
@@ -67,7 +110,6 @@ public class Game {
         catch (Exception e) {
             e.getMessage();
         }
-
     }
 
     public GameBoard getGameBoard() {
@@ -92,5 +134,13 @@ public class Game {
 
     public void setTeamTwo(Team teamTwo) {
         this.teamTwo = teamTwo;
+    }
+
+    public Piece getPieceInHand() {
+        return pieceInHand;
+    }
+
+    public void setPieceInHand(Piece pieceInHand) {
+        this.pieceInHand = pieceInHand;
     }
 }

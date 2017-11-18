@@ -11,12 +11,12 @@ import java.util.ArrayList;
 public class GameBoard extends GridPane {
     final int ROWS = 8;
     final int COLS = 8;
-    private ArrayList<Tile> tiles;
+    private Tile[][] tiles;
     private Color color = Color.BEIGE;
 
     public GameBoard() {
         super();
-        tiles = new ArrayList<>();
+        tiles = new Tile[8][8];
         setUpGameBoard();
     }
 
@@ -26,8 +26,8 @@ public class GameBoard extends GridPane {
             for (int x = 0; x < ROWS; x++) {
                 alternateBoardColors();
                 Tile tile = new Tile(x, y, color);
-                getTiles().add(tile);
-                super.add(tile, tile.getxPos(), tile.getyPos());
+                getTiles()[x][y] = tile;
+                super.add(tile, x, y);
             }
         }
     }
@@ -46,15 +46,16 @@ public class GameBoard extends GridPane {
         this.color = color;
     }
 
-    public ArrayList<Tile> getTiles() {
+    public Tile[][] getTiles() {
         return tiles;
     }
 
-    public Tile getTileAt(int row, int col) throws Exception{
-        for (Tile tile : getTiles()) {
-            if (tile.getxPos() == row && tile.getyPos() == col)
-                return tile;
+    public Tile getTileAt(int col, int row) throws Exception{
+        try {
+            return getTiles()[col][row];
         }
-        throw new Exception("Program tried to access a tile that doesn't exist.");
+        catch (Exception e){
+            throw new Exception("Program tried to access a tile that doesn't exist.");
+        }
     }
 }

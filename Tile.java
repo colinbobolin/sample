@@ -10,16 +10,16 @@ public class Tile extends Rectangle {
     final double HEIGHT = 50;
     final double WIDTH = 50;
     private boolean isOccupied;
-    private int xPos;
-    private int yPos;
+    private int row;
+    private int col;
     private Piece piece;
 
     public Tile(int x, int y, Color color) {
         super();
         setHeight(HEIGHT);
         setWidth(WIDTH);
-        setxPos(x);
-        setyPos(y);
+        setRow(x);
+        setCol(y);
         setFill(color);
         setOccupied(false);
         //TODO set onClickListener to light up adjacent unoccupied tiles
@@ -41,21 +41,22 @@ public class Tile extends Rectangle {
 
     public void setPiece(Piece piece) {
         this.piece = piece;
+        setOccupied(true);
     }
 
-    public int getxPos() {
-        return xPos;
+    public int getRow() {
+        return row;
     }
 
-    public void setxPos(int xPos) {
-        this.xPos = xPos;
+    public void setRow(int row) {
+        this.row = row;
     }
 
-    public int getyPos() {
-        return yPos;
+    public int getCol() {
+        return col;
     }
 
-    public void setyPos(int yPos) {
-        this.yPos = yPos;
+    public void setCol(int col) {
+        this.col = col;
     }
 }
