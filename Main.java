@@ -13,7 +13,6 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         //TODO set up a start menu
-        new Game();
+        Game.getInstance();
     }
-
 }

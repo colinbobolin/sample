@@ -15,8 +15,9 @@ public class Game {
     private Team teamTwo;
     private GameBoard gameBoard;
     private Piece pieceInHand;
+    private static Game instance = null;
 
-    public Game() {
+    private Game() {
         setGameBoard(new GameBoard());
         setTeamOne(new Team(Color.DARKRED));
         setTeamTwo(new Team(Color.BLACK));
@@ -28,6 +29,11 @@ public class Game {
 
         stage.setScene(scene);
         stage.show();
+    }
+
+    public static Game getInstance() {
+        if(instance == null) instance = new Game();
+        return instance;
     }
 
     public void setUpPieces() {
@@ -77,39 +83,17 @@ public class Game {
         }
     }
 
-    public void moveFromTileToTile(Tile startingTile, Tile requestedTile) {
-
-        removePieceFromTile(startingTile);
-        placePieceOnTile(getPieceInHand(), requestedTile);
-    }
-
     public void removePieceFromTile(Tile tile) {
         Piece piece = tile.getPiece();
-        setPieceInHand(piece);
-        getGameBoard().getChildren().remove(tile);
-        piece.setOnBoard(false);
         tile.setOccupied(false);
+        setPieceInHand(piece);
+        getGameBoard().getChildren().remove(piece);
     }
 
     public void placePieceOnTile(Piece piece, Tile tile) {
         tile.setPiece(piece);
+        piece.setTile(tile);
         getGameBoard().add(piece, tile.getRow(), tile.getCol());
-        getGameBoard().getTiles()[tile.getRow()][tile.getCol()] = tile;
-        tile.setOccupied(true);
-        piece.setOnBoard(true);
-    }
-
-    public void showMoveOptions(Tile tile) {
-        ArrayList<Tile> moveOptions = new ArrayList<>();
-        int row = tile.getRow();
-        int col = tile.getCol();
-        try {
-            moveOptions.add(getGameBoard().getTileAt(row+1, col+1));
-            moveOptions.add(getGameBoard().getTileAt(row-1, col+1));
-        }
-        catch (Exception e) {
-            e.getMessage();
-        }
     }
 
     public GameBoard getGameBoard() {
@@ -141,6 +125,12 @@ public class Game {
     }
 
     public void setPieceInHand(Piece pieceInHand) {
-        this.pieceInHand = pieceInHand;
+            System.out.println("piece is in hand");
+            pieceInHand.setOnBoard(false);
+            this.pieceInHand = pieceInHand;
+    }
+
+    public void emptyHand() {
+        this.pieceInHand = null;
     }
 }

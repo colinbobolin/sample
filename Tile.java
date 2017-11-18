@@ -23,7 +23,12 @@ public class Tile extends Rectangle {
         setFill(color);
         setOccupied(false);
         //TODO set onClickListener to light up adjacent unoccupied tiles
-        setOnMouseClicked(event -> {
+        setOnMousePressed(event -> {
+            System.out.println("Tile event initiated");
+            if (Game.getInstance().getPieceInHand() != null && !isOccupied()) {
+                Game.getInstance().placePieceOnTile(Game.getInstance().getPieceInHand(), this);
+                Game.getInstance().emptyHand();
+            }
         });
     }
 
@@ -42,6 +47,7 @@ public class Tile extends Rectangle {
     public void setPiece(Piece piece) {
         this.piece = piece;
         setOccupied(true);
+        piece.setTile(this);
     }
 
     public int getRow() {
