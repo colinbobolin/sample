@@ -1,5 +1,4 @@
 package sample;
-
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 
@@ -50,12 +49,10 @@ public class GameBoard extends GridPane {
         return tiles;
     }
 
-    public Tile getTileAt(int col, int row) throws Exception{
-        try {
-            return getTiles()[col][row];
+    public Tile getTileAt(int col, int row) throws IndexOutOfBoundsException{
+        if (col > COLS + 1 || row > ROWS + 1) {
+            throw new IndexOutOfBoundsException("Program tried to access a tile that doesn't exist.");
         }
-        catch (Exception e){
-            throw new Exception("Program tried to access a tile that doesn't exist.");
-        }
+        else return getTiles()[col][row];
     }
 }

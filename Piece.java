@@ -15,11 +15,6 @@ public class Piece extends Circle {
         super(22, color);
         setColor(color);
         setOnBoard(false);
-        setOnMousePressed(event -> {
-            if (Game.getInstance().getPieceInHand() == null) {
-                Game.getInstance().removePieceFromTile(getTile());
-            }
-        });
     }
 
     public boolean isOnBoard() {
