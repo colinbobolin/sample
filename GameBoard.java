@@ -15,7 +15,7 @@ public class GameBoard extends GridPane {
 
     public GameBoard() {
         super();
-        tiles = new Tile[8][8];
+        tiles = new Tile[ROWS][COLS];
         setUpGameBoard();
     }
 

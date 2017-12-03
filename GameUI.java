@@ -12,10 +12,12 @@ import java.util.ArrayList;
 public class GameUI extends Application {
     Game game;
     private Piece selectedPiece;
+    private Team teamWhoseTurnItIs;
     ArrayList<Tile> possibleTiles = new ArrayList<>();
 
     public GameUI() {
         game = Game.getInstance();
+        setTeamWhoseTurnItIs(game.getTeamRed());
     }
 
     @Override
@@ -26,10 +28,71 @@ public class GameUI extends Application {
         stage.setScene(scene);
         stage.show();
 
-        for (Piece piece : game.getTeamOne().getPieceList()) {
-            piece.setOnMousePressed(new SelectPieceHandler());
+        nextTurn(getTeamWhoseTurnItIs());
+    }
+
+    public void highlightPossibleMovesFromTile(Tile currentTile) {
+        possibleTiles.clear();
+
+        if (getTeamWhoseTurnItIs()==game.getTeamRed()) {
+            lookBottomLeftDiagonal(currentTile);
+            lookBottomRightDiagonal(currentTile);
         }
-        for (Piece piece : game.getTeamTwo().getPieceList()) {
+        if (getTeamWhoseTurnItIs()==game.getTeamBlack()) {
+            lookTopLeftDiagonal(currentTile);
+            lookTopRightDiagonal(currentTile);
+        }
+        for (Tile tile : possibleTiles) {
+            tile.setColor(Color.LIGHTBLUE);
+        }
+    }
+
+    public void clearPossibleTiles() {
+        for (Tile tile : possibleTiles) {
+            tile.setColor(Color.BURLYWOOD);
+        }
+        possibleTiles.clear();
+    }
+
+    public void lookBottomRightDiagonal(Tile currentTile) {
+        int possTileRow = currentTile.getRow()+1;
+        int possTileCol = currentTile.getCol()+1;
+        Tile possibleTile = game.getGameBoard().getTileAt(possTileCol, possTileRow);
+        if (!possibleTile.isOccupied()) {
+            possibleTiles.add(possibleTile);
+        }
+    }
+
+    public void lookBottomLeftDiagonal(Tile currentTile) {
+        int possTileRow = currentTile.getRow()+1;
+        int possTileCol = currentTile.getCol()-1;
+        Tile possibleTile = game.getGameBoard().getTileAt(possTileCol, possTileRow);
+        if (!possibleTile.isOccupied()) {
+            possibleTiles.add(possibleTile);
+        }
+    }
+
+    public void lookTopRightDiagonal(Tile currentTile) {
+        int possTileRow = currentTile.getRow()-1;
+        int possTileCol = currentTile.getCol()+1;
+        Tile possibleTile = game.getGameBoard().getTileAt(possTileCol, possTileRow);
+        if (!possibleTile.isOccupied()) {
+            possibleTiles.add(possibleTile);
+        }
+    }
+
+    public void lookTopLeftDiagonal(Tile currentTile) {
+        int possTileRow = currentTile.getRow()-1;
+        int possTileCol = currentTile.getCol()-1;
+        Tile possibleTile = game.getGameBoard().getTileAt(possTileCol, possTileRow);
+        if (!possibleTile.isOccupied()) {
+            possibleTiles.add(possibleTile);
+        }
+    }
+
+    //Game loop
+    public void nextTurn(Team team) {
+        for (Piece piece : team.getPieceList()) {
             piece.setOnMousePressed(new SelectPieceHandler());
         }
         for (Tile[] tileRow : game.getGameBoard().getTiles()) {
@@ -39,37 +102,11 @@ public class GameUI extends Application {
         }
     }
 
-    public void highlightPossibleMoves() {
-        Tile currentTile = getSelectedPiece().getTile();
-        int currentTileRow = currentTile.getRow();
-        int currentTileCol = currentTile.getCol();
-        int possTileRow;
-        int possTileCol;
-        possibleTiles.clear();
-        //TODO I would like to split this up into more methods, one for red team and one for black. It's messy now, but its starting to come together.
-        try {
-            for (Tile[] tileRow : game.getGameBoard().getTiles()) {
-                for (Tile tile : tileRow) {
-                    if (tile.isValid() && !tile.isOccupied()) {
-                        possTileRow = tile.getRow();
-                        possTileCol = tile.getCol();
-
-                        if(possTileRow == currentTileRow + 1 && possTileCol == currentTileCol + 1)
-                            possibleTiles.add(tile);
-                        if(possTileRow == currentTileRow + - 1 && possTileCol == currentTileCol + 1)
-                            possibleTiles.add(tile);
-                    }
-                }
-            }
+    public void alternateTeamWhoseTurnItIs() {
+        if (getTeamWhoseTurnItIs() == game.getTeamRed()) {
+            setTeamWhoseTurnItIs(game.getTeamBlack());
         }
-        catch (IndexOutOfBoundsException e){
-            System.out.println(e.getMessage());
-        }
-
-        for (Tile tile : possibleTiles) {
-            tile.setColor(Color.LIGHTBLUE);
-        }
-
+        else setTeamWhoseTurnItIs(game.getTeamRed());
     }
 
     public Piece getSelectedPiece() {
@@ -81,13 +118,22 @@ public class GameUI extends Application {
         System.out.println("Piece selected!");
     }
 
+    public Team getTeamWhoseTurnItIs() {
+        return teamWhoseTurnItIs;
+    }
+
+    public void setTeamWhoseTurnItIs(Team teamWhoseTurnItIs) {
+        this.teamWhoseTurnItIs = teamWhoseTurnItIs;
+    }
+
     class SelectPieceHandler implements EventHandler<MouseEvent> {
 
         @Override
         public void handle(MouseEvent event) {
+            clearPossibleTiles();
             Piece selectedPiece = ((Piece)event.getSource());
             setSelectedPiece(selectedPiece);
-            highlightPossibleMoves();
+            highlightPossibleMovesFromTile(selectedPiece.getTile());
         }
     }
 
@@ -99,9 +145,9 @@ public class GameUI extends Application {
             if (getSelectedPiece() != null && !selectedTile.isOccupied() && (selectedTile.getColor() == Color.LIGHTBLUE)) {
                 selectedTile.setPiece(getSelectedPiece());
                 setSelectedPiece(null);
-                for (Tile tile : possibleTiles) {
-                    tile.setColor(Color.BURLYWOOD);
-                }
+                alternateTeamWhoseTurnItIs();
+                nextTurn(getTeamWhoseTurnItIs());
+                clearPossibleTiles();
             }
 
         }

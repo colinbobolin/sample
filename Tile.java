@@ -13,7 +13,6 @@ public class Tile extends StackPane {
     final double WIDTH = 50;
     private Rectangle rectangle;
     private boolean isOccupied;
-    private boolean isValid;
     private int row;
     private int col;
     private Piece piece;
@@ -27,8 +26,6 @@ public class Tile extends StackPane {
         setRectangle(new Rectangle(WIDTH, HEIGHT, color));
         setAlignment(Pos.CENTER);
         setOccupied(false);
-        if (getColor().equals(Color.BURLYWOOD)) setValid(true);
-        else setValid(false);
     }
 
     public boolean isOccupied() {
@@ -50,14 +47,12 @@ public class Tile extends StackPane {
         this.piece = piece;
         getChildren().add(piece);
         setOccupied(true);
-        setValid(false);
         piece.setTile(this);
     }
 
     public void removePiece(Piece piece) {
         getChildren().remove(piece);
         setOccupied(false);
-        setValid(true);
     }
 
     public int getRow() {
@@ -82,14 +77,6 @@ public class Tile extends StackPane {
 
     public void setColor(Color color) {
         getRectangle().setFill(color);
-    }
-
-    public boolean isValid() {
-        return isValid;
-    }
-
-    public void setValid(boolean valid) {
-        isValid = valid;
     }
 
     public Rectangle getRectangle() {

@@ -2,17 +2,19 @@ package sample;
 
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
+
 
 public class Game {
-    private Team teamOne;
-    private Team teamTwo;
+    private Team teamRed;
+    private Team teamBlack;
     private GameBoard gameBoard;
     private static Game instance = null;
 
     private Game() {
         setGameBoard(new GameBoard());
-        setTeamOne(new Team(Color.DARKRED));
-        setTeamTwo(new Team(Color.BLACK));
+        setTeamRed(new Team(Color.DARKRED));
+        setTeamBlack(new Team(Color.BLACK));
 
         setUpPieces();
     }
@@ -28,7 +30,7 @@ public class Game {
     }
 
     public void setUpTeamOne() {
-        for (Piece piece : getTeamOne().getPieceList()) {
+        for (Piece piece : getTeamRed().getPieceList()) {
             for (int m = 0; m < getGameBoard().getTiles().length; m++) {
                 for (int n = 0; n < getGameBoard().getTiles()[m].length; n++) {
                     try {
@@ -49,7 +51,7 @@ public class Game {
     }
 
     public void setUpTeamTwo() {
-        for (Piece piece : getTeamTwo().getPieceList()) {
+        for (Piece piece : getTeamBlack().getPieceList()) {
             for (int m = getGameBoard().getTiles().length - 1; m >= 0; m--) {
                 for (int n = getGameBoard().getTiles()[m].length - 1; n >= 0; n--) {
                     try {
@@ -77,19 +79,20 @@ public class Game {
         this.gameBoard = gameBoard;
     }
 
-    public Team getTeamOne() {
-        return teamOne;
+    public Team getTeamRed() {
+        return teamRed;
     }
 
-    public void setTeamOne(Team teamOne) {
-        this.teamOne = teamOne;
+    public void setTeamRed(Team teamOne) {
+        this.teamRed = teamOne;
     }
 
-    public Team getTeamTwo() {
-        return teamTwo;
+    public Team getTeamBlack() {
+        return teamBlack;
     }
 
-    public void setTeamTwo(Team teamTwo) {
-        this.teamTwo = teamTwo;
+    public void setTeamBlack(Team teamBlack) {
+        this.teamBlack = teamBlack;
     }
+
 }
