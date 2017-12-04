@@ -17,7 +17,7 @@ public class Tile extends StackPane {
     private int col;
     private Piece piece;
 
-    public Tile(int row, int col, Color color) {
+    public Tile(int col, int row, Color color) {
         super();
         setHeight(HEIGHT);
         setWidth(WIDTH);
