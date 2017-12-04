@@ -72,7 +72,7 @@ public class Tile extends StackPane {
     }
 
     public Color getColor() {
-        return (Color)getRectangle().getFill();
+        return (Color) getRectangle().getFill();
     }
 
     public void setColor(Color color) {

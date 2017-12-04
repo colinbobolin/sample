@@ -7,7 +7,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
+import java.util.*;
+
+//TODO Make the interface look nice. Handle exceptions for when a piece tries to access a Tile outside of the array. Fix any bugs.
 
 /**
  * This class contains all of the User Interface logic. The game starts with nextTurn(), and sets up MouseEvent handlers
@@ -18,21 +20,22 @@ import java.util.ArrayList;
  */
 
 public class GameUI extends Application {
-    Game game;
+    private Game game;
     private Piece selectedPiece;
     private Team teamWhoseTurnItIs;
     private ArrayList<Tile> possibleTiles = new ArrayList<>();
     private ArrayList<Tile> priorityTiles = new ArrayList<>();
+    private Map<Tile, Piece> victimMap = new HashMap<>(); //HashMap for relating a victim piece to a priority tile
 
     public GameUI() {
-        game = Game.getInstance();
-        setTeamWhoseTurnItIs(game.getTeamRed());
+        setGame(Game.getInstance());
+        setTeamWhoseTurnItIs(getGame().getTeamRed());
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         Stage stage = new Stage();
-        Scene scene = new Scene(game.getGameBoard());
+        Scene scene = new Scene(getGame().getGameBoard());
 
         stage.setScene(scene);
         stage.show();
@@ -50,11 +53,11 @@ public class GameUI extends Application {
     public void highlightPossibleMovesFromTile(Tile currentTile) {
         clearHighlightedTiles();
 
-        if (getTeamWhoseTurnItIs()==game.getTeamRed()) {
+        if (getTeamWhoseTurnItIs() == getGame().getTeamRed()) {
             lookBottomLeftDiagonal(currentTile);
             lookBottomRightDiagonal(currentTile);
         }
-        if (getTeamWhoseTurnItIs()==game.getTeamBlack()) {
+        if (getTeamWhoseTurnItIs() == getGame().getTeamBlack()) {
             lookTopLeftDiagonal(currentTile);
             lookTopRightDiagonal(currentTile);
         }
@@ -64,13 +67,12 @@ public class GameUI extends Application {
                 tile.setOnMousePressed(new SelectTileHandler());
             }
 
-        }
-        else if (getPriorityTiles().size() == 0 && getPossibleTiles().size() > 0) {
-            for (Tile tile: getPossibleTiles()) {
+        } else if (getPriorityTiles().size() == 0 && getPossibleTiles().size() > 0) {
+            for (Tile tile : getPossibleTiles()) {
                 tile.setOnMousePressed(new SelectTileHandler());
             }
         }
-        // ELSE, THERE IS NO POSSIBLE MOVE AND THE WINNER IS THE OTHER TEAM!
+        else System.out.println("GAME OVER");
     }
 
     public void setPossibleMove(Tile tile) {
@@ -96,14 +98,16 @@ public class GameUI extends Application {
             setPossibleMove(possibleTile);
         }
         else if (possibleTile.isOccupied() && !getBottomRightDiagonal(possibleTile).isOccupied()) {
-            setPriorityMove(getBottomRightDiagonal(possibleTile));
+            Tile possibleJumpTile = getBottomRightDiagonal(possibleTile);
+            setPriorityMove(possibleJumpTile);
+            victimMap.put(possibleJumpTile, possibleTile.getPiece());
         }
     }
 
     public Tile getBottomRightDiagonal(Tile currentTile) {
         int possTileRow = currentTile.getRow()+1;
         int possTileCol = currentTile.getCol()+1;
-        return game.getGameBoard().getTileAt(possTileCol, possTileRow);
+        return getGame().getGameBoard().getTileAt(possTileCol, possTileRow);
     }
 
     public void lookBottomLeftDiagonal(Tile currentTile) {
@@ -112,14 +116,16 @@ public class GameUI extends Application {
             setPossibleMove(possibleTile);
         }
         else if (possibleTile.isOccupied() && !getBottomLeftDiagonal(possibleTile).isOccupied()) {
-            setPriorityMove(getBottomLeftDiagonal(possibleTile));
+            Tile possibleJumpTile = getBottomLeftDiagonal(possibleTile);
+            setPriorityMove(possibleJumpTile);
+            victimMap.put(possibleJumpTile, possibleTile.getPiece());
         }
     }
 
     public Tile getBottomLeftDiagonal(Tile currentTile) {
         int possTileRow = currentTile.getRow()+1;
         int possTileCol = currentTile.getCol()-1;
-        return game.getGameBoard().getTileAt(possTileCol, possTileRow);
+        return getGame().getGameBoard().getTileAt(possTileCol, possTileRow);
     }
 
     public void lookTopRightDiagonal(Tile currentTile) {
@@ -128,14 +134,16 @@ public class GameUI extends Application {
             setPossibleMove(possibleTile);
         }
         else if (possibleTile.isOccupied() && !getTopRightDiagonal(possibleTile).isOccupied()) {
-            setPriorityMove(getTopRightDiagonal(possibleTile));
+            Tile possibleJumpTile = getTopRightDiagonal(possibleTile);
+            setPriorityMove(possibleJumpTile);
+            victimMap.put(possibleJumpTile, possibleTile.getPiece());
         }
     }
 
     public Tile getTopRightDiagonal(Tile currentTile) {
         int possTileRow = currentTile.getRow()-1;
         int possTileCol = currentTile.getCol()+1;
-        return game.getGameBoard().getTileAt(possTileCol, possTileRow);
+        return getGame().getGameBoard().getTileAt(possTileCol, possTileRow);
     }
 
     public void lookTopLeftDiagonal(Tile currentTile) {
@@ -144,21 +152,23 @@ public class GameUI extends Application {
             setPossibleMove(possibleTile);
         }
         else if (possibleTile.isOccupied() && !getTopLeftDiagonal(possibleTile).isOccupied()) {
-            setPriorityMove(getTopLeftDiagonal(possibleTile));
+            Tile possibleJumpTile = getTopLeftDiagonal(possibleTile);
+            setPriorityMove(possibleJumpTile);
+            victimMap.put(possibleJumpTile, possibleTile.getPiece());
         }
     }
 
     public Tile getTopLeftDiagonal(Tile currentTile) {
         int possTileRow = currentTile.getRow()-1;
         int possTileCol = currentTile.getCol()-1;
-        return game.getGameBoard().getTileAt(possTileCol, possTileRow);
+        return getGame().getGameBoard().getTileAt(possTileCol, possTileRow);
     }
 
     public void alternateTeamWhoseTurnItIs() {
-        if (getTeamWhoseTurnItIs() == game.getTeamRed()) {
-            setTeamWhoseTurnItIs(game.getTeamBlack());
+        if (getTeamWhoseTurnItIs() == getGame().getTeamRed()) {
+            setTeamWhoseTurnItIs(getGame().getTeamBlack());
         }
-        else setTeamWhoseTurnItIs(game.getTeamRed());
+        else setTeamWhoseTurnItIs(getGame().getTeamRed());
     }
 
     public void movePieceToTile(Piece piece, Tile tile) {
@@ -169,8 +179,8 @@ public class GameUI extends Application {
     public void resetForNextTurn() {
         setSelectedPiece(null);
         turnOffListeners(getTeamWhoseTurnItIs());
-        alternateTeamWhoseTurnItIs();
         clearHighlightedTiles();
+        alternateTeamWhoseTurnItIs();
         nextTurn(getTeamWhoseTurnItIs());
     }
 
@@ -178,6 +188,11 @@ public class GameUI extends Application {
         for (Piece piece : team.getPieceList()) piece.setOnMousePressed(null);
         for (Tile tile : getPossibleTiles()) tile.setOnMouseClicked(null);
         for (Tile tile : getPriorityTiles()) tile.setOnMouseClicked(null);
+    }
+
+    public void remove(Piece piece) {
+        piece.getTile().removePiece(piece);
+        piece.remove();
     }
 
     public Piece getSelectedPiece() {
@@ -204,6 +219,14 @@ public class GameUI extends Application {
         return possibleTiles;
     }
 
+    public Game getGame() {
+        return game;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
     class SelectPieceHandler implements EventHandler<MouseEvent> {
 
         @Override
@@ -220,8 +243,15 @@ public class GameUI extends Application {
         @Override
         public void handle(MouseEvent event) {
             Tile selectedTile = (Tile)event.getSource();
-            if (getSelectedPiece() != null && !selectedTile.isOccupied() && (selectedTile.getColor() == Color.LIGHTBLUE) || selectedTile.getColor() == Color.RED) {
-                movePieceToTile(getSelectedPiece(), selectedTile);
+            if (getSelectedPiece() != null && !selectedTile.isOccupied()) {
+                if (selectedTile.getColor() == Color.RED) {
+                    movePieceToTile(getSelectedPiece(), selectedTile);
+                    Piece victim = victimMap.get(selectedTile);
+                    remove(victim);
+                }
+                else if (selectedTile.getColor() == Color.LIGHTBLUE)  {
+                    movePieceToTile(getSelectedPiece(), selectedTile);
+                }
             }
         }
     }

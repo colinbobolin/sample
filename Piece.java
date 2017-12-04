@@ -17,6 +17,11 @@ public class Piece extends Circle {
         setOnBoard(false);
     }
 
+    public void remove() {
+        setOnBoard(false);
+        tile = null;
+    }
+
     public boolean isOnBoard() {
         return isOnBoard;
     }
